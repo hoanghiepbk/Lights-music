@@ -1,3 +1,206 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================================================
+   NhipSang — "night instrument cluster of a VF8" (Blueprint §9)
+   Dark, flat, premium automotive HMI. Mono telemetry, tracked
+   micro-labels. One bold thing: the cabin glow + policy pips.
+   ============================================================ */
+:root {
+  --void: #080b11;
+  --panel: #0f1620;
+  --panel-2: #131c28;
+  --line: #1e2a3a;
+  --text: #e7edf4;
+  --muted: #69788c;
+  --teal: #35d6c2;
+  --amber: #ffb020;
+  --red: #ff5364;
+
+  --font-sans: ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 700px at 22% -8%, #0d1622 0%, transparent 60%),
+    var(--void);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* tracked instrument micro-label */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.telemetry {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.panel {
+  background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+/* segmented control (gear / preset) */
+.seg {
+  display: inline-flex;
+  padding: 3px;
+  gap: 3px;
+  background: #0b121b;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.seg > button {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  padding: 6px 12px;
+  border-radius: 7px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background 120ms ease;
+}
+.seg > button:hover {
+  color: var(--text);
+}
+.seg > button[data-active='true'] {
+  color: var(--void);
+  background: var(--teal);
+}
+
+/* toggle */
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #0b121b;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+.toggle[data-on='true'] {
+  background: color-mix(in srgb, var(--amber) 28%, #0b121b);
+  border-color: var(--amber);
+}
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--muted);
+  transition:
+    transform 140ms ease,
+    background 140ms ease;
+}
+.toggle[data-on='true']::after {
+  transform: translateX(20px);
+  background: var(--amber);
+}
+
+/* range input */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--line);
+  outline: none;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--teal);
+  cursor: pointer;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--teal) 60%, transparent);
+}
+input[type='range']::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--teal);
+  cursor: pointer;
+}
+
+/* policy-gate status pip — lights up when a rule engages */
+.pip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.pip > .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #223044;
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition:
+    background 120ms ease,
+    box-shadow 120ms ease;
+}
+.pip[data-on='true'] {
+  color: var(--text);
+}
+.pip[data-on='true'] > .dot {
+  background: var(--c, var(--teal));
+  box-shadow: 0 0 10px var(--c, var(--teal));
+}
+
+/* cabin beat ripple — replays on remount (keyed by pulse id) */
+@keyframes cabin-pulse {
+  from {
+    opacity: 0.55;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+.cabin-pulse {
+  transform-origin: center;
+  animation: cabin-pulse 380ms ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cabin-pulse {
+    animation: none;
+    opacity: 0;
+  }
+  * {
+    transition: none !important;
+  }
+}

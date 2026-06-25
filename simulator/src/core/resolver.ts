@@ -14,6 +14,7 @@ export interface ResolveContext {
   requests: ReadonlyArray<LightingRequest | null>;
   state: VehicleState;
   features: AudioFeatures;
+  fault?: boolean; // D-007: an upstream fault forces the INV-5 failsafe
 }
 
 export interface LightingResolver {
@@ -27,8 +28,12 @@ export function createLightingResolver(): LightingResolver {
 
   return {
     resolve(ctx: ResolveContext): LightingCommand {
+      // D-007: any upstream fault drops straight to the safe static state,
+      // regardless of what the sources requested this frame.
+      if (ctx.fault === true) return failSafe();
+
       const winner = arbitrate(ctx.requests);
-      if (!winner) return failSafe(); // INV-5
+      if (!winner) return failSafe(); // INV-5 (defensive: empty request set)
 
       const policy = applyPolicy(winner, ctx.state);
 
