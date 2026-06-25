@@ -1,0 +1,22 @@
+{
+  "name": "nhipsang",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "description": "NhipSang — music-reactive ambient lighting simulator (monorepo root)",
+  "scripts": {
+    "dev": "pnpm --filter simulator dev",
+    "build": "pnpm --filter simulator build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter eval test",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "eslint": "^9.13.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.11.0"
+  }
+}

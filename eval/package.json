@@ -1,0 +1,20 @@
+{
+  "name": "eval",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "NhipSang eval-as-code — Vitest invariant suite (INV-1..6) + smoke",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nhipsang/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
+  }
+}

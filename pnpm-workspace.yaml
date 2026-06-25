@@ -1,0 +1,6 @@
+# JS workspace packages. NOTE: `firmware` is intentionally EXCLUDED —
+# it is a PlatformIO (C++) project, not part of the pnpm/JS toolchain.
+packages:
+  - simulator
+  - schema
+  - eval
