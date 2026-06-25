@@ -4,6 +4,10 @@ import type { AudioFeatures } from '@nhipsang/schema';
 import { createAudioEngine, type AudioEngine } from '../audio';
 import { createWebAudioSource } from '../audio/webAudioSource';
 
+// Default track bundled in public/ so the sim works on Play without uploading a
+// file. Replace public/demo.mp3 (or pick a file) to use your own music.
+const DEFAULT_TRACK = `${import.meta.env.BASE_URL}demo.mp3`;
+
 // Picks a track (file or URL) → WebAudioSource → AudioEngine, streaming features
 // up to the app. A fresh <audio> element per play keeps Web Audio's one-source-
 // per-element rule happy across stop/replay.
@@ -16,11 +20,12 @@ export function AudioPicker({
   onPlayingChange: (playing: boolean) => void;
   onAudioError: (faulted: boolean) => void;
 }): React.JSX.Element {
-  const [label, setLabel] = useState('No track loaded');
+  const [label, setLabel] = useState('Demo track (default) · demo.mp3');
   const [urlText, setUrlText] = useState('');
   const [playing, setPlaying] = useState(false);
 
-  const srcRef = useRef<string | null>(null);
+  // start on the bundled demo track so Play just works
+  const srcRef = useRef<string | null>(DEFAULT_TRACK);
   const isObjectUrlRef = useRef(false);
   const engineRef = useRef<AudioEngine | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -85,19 +90,24 @@ export function AudioPicker({
       <div className="flex flex-col gap-2">
         <span className="eyebrow">Track</span>
         <div className="flex items-center gap-2">
-          <label className="cursor-pointer rounded-lg border border-[var(--line)] bg-[#0b121b] px-3 py-2 text-xs text-[var(--text)] transition hover:border-[var(--teal)]">
+          <label
+            title="Chọn file nhạc trong máy để phân tích (FFT/onset)"
+            className="cursor-pointer rounded-lg border border-[var(--line)] bg-[#0b121b] px-3 py-2 text-xs text-[var(--text)] transition hover:border-[var(--teal)]"
+          >
             Choose file
             <input type="file" accept="audio/*" className="hidden" onChange={onFile} />
           </label>
           <input
             type="url"
             inputMode="url"
+            title="Dán URL audio (server cần cho phép CORS) rồi bấm Load"
             placeholder="…or paste an audio URL"
             value={urlText}
             onChange={(e) => setUrlText(e.target.value)}
             className="w-56 rounded-lg border border-[var(--line)] bg-[#0b121b] px-3 py-2 text-xs text-[var(--text)] outline-none focus:border-[var(--teal)]"
           />
           <button
+            title="Nạp URL audio đã dán làm nguồn nhạc"
             className="rounded-lg border border-[var(--line)] px-3 py-2 text-xs text-[var(--muted)] transition hover:text-[var(--text)]"
             onClick={() => urlText && setSource(urlText, urlText, false)}
           >
@@ -109,6 +119,7 @@ export function AudioPicker({
 
       <button
         onClick={() => (playing ? stop() : void play())}
+        title={playing ? 'Dừng phát nhạc' : 'Phát nhạc — bắt đầu phân tích FFT/onset và lái đèn theo nhạc'}
         className="rounded-lg px-5 py-2.5 text-sm font-medium transition"
         style={{
           background: playing ? 'transparent' : 'var(--teal)',

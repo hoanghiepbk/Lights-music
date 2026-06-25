@@ -25,7 +25,10 @@ export function VehicleStatePanel(): React.JSX.Element {
       <span className="eyebrow">Vehicle state</span>
 
       <Row label="Gear">
-        <div className="seg self-start">
+        <div
+          className="seg self-start"
+          title="Số xe. P = đỗ (full effect). R/N/D = ngoài P → kích hoạt chế độ lái: cấm đỏ/xanh, giảm sáng, tắt nháy ở vùng tài xế."
+        >
           {GEARS.map((g) => (
             <button key={g} data-active={s.gear === g} onClick={() => vehicleStore.set({ gear: g })}>
               {g}
@@ -40,6 +43,7 @@ export function VehicleStatePanel(): React.JSX.Element {
           min={0}
           max={120}
           step={1}
+          title="Tốc độ. Trên 5 km/h → vùng tài xế bị cap độ sáng ≤35% (INV-3)."
           value={s.speedKmh}
           onChange={(e) => vehicleStore.set({ speedKmh: Number(e.target.value) })}
         />
@@ -51,6 +55,7 @@ export function VehicleStatePanel(): React.JSX.Element {
           min={16}
           max={30}
           step={1}
+          title="Nhiệt độ cabin. Đổi nhiệt → overlay HVAC (màu lạnh/ấm) chèn tạm ~2.5s rồi nhường lại music."
           value={s.hvacTempC}
           onChange={(e) => vehicleStore.set({ hvacTempC: Number(e.target.value) })}
         />
@@ -63,6 +68,7 @@ export function VehicleStatePanel(): React.JSX.Element {
           data-on={s.seatbeltWarn}
           aria-pressed={s.seatbeltWarn}
           aria-label="Seatbelt warning"
+          title="Cảnh báo dây an toàn. Bật → winner=SAFETY, telltale amber (được miễn cấm màu/giảm sáng)."
           onClick={() => vehicleStore.set({ seatbeltWarn: !s.seatbeltWarn })}
         />
       </div>
@@ -74,6 +80,7 @@ export function VehicleStatePanel(): React.JSX.Element {
           data-on={s.adasWarn}
           aria-pressed={s.adasWarn}
           aria-label="ADAS warning"
+          title="Cảnh báo ADAS. Bật → winner=SAFETY, telltale đỏ (ưu tiên cao nhất, music nhường ngay)."
           onClick={() => vehicleStore.set({ adasWarn: !s.adasWarn })}
         />
       </div>

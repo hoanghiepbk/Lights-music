@@ -9,6 +9,7 @@ import { VehicleStatePanel } from './ui/VehicleStatePanel';
 import { TracePanel } from './ui/TracePanel';
 import { PresetSelector } from './ui/PresetSelector';
 import { AudioPicker } from './ui/AudioPicker';
+import { HelpOverlay } from './ui/HelpOverlay';
 
 const ZERO_FEATURES: AudioFeatures = {
   bands: { bass: 0, mid: 0, high: 0 },
@@ -30,6 +31,7 @@ export default function App() {
   const [transportStatus, setTransportStatus] = useState<TransportStatus>(() => transportRef.current!.status());
   const [scenarioRunning, setScenarioRunning] = useState(false);
   const [caption, setCaption] = useState<string | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   const presetRef = useRef(presetId);
   const playingRef = useRef(false);
@@ -127,12 +129,22 @@ export default function App() {
 
   return (
     <div className="flex h-screen flex-col gap-4 p-4 lg:p-6">
+      {showHelp && <HelpOverlay onClose={() => setShowHelp(false)} />}
       <header className="flex items-center justify-between">
         <div className="flex items-baseline gap-3">
           <h1 className="text-lg font-semibold tracking-tight">NhipSang</h1>
           <span className="eyebrow">music-reactive cabin · local sim</span>
         </div>
-        <span className="eyebrow">schema v0.2.0</span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowHelp(true)}
+            title="Mở hướng dẫn: giải thích từng phần, kịch bản demo và cách test"
+            className="rounded-lg border border-[var(--line)] px-3 py-1.5 text-xs text-[var(--text)] transition hover:border-[var(--teal)] hover:text-[var(--teal)]"
+          >
+            ? Hướng dẫn
+          </button>
+          <span className="eyebrow">schema v0.2.0</span>
+        </div>
       </header>
 
       {caption && (
@@ -157,6 +169,7 @@ export default function App() {
           <span className="eyebrow">Demo · REQ-031</span>
           <button
             onClick={toggleScenario}
+            title="Chạy demo tự động ~30s: Đỗ→Lái→tăng tốc→cảnh báo dây an toàn→Đỗ. Bấm Play nhạc trước để thấy cả sync nhạc."
             className="rounded-lg px-5 py-2.5 text-sm font-medium transition"
             style={{
               background: scenarioRunning ? 'transparent' : 'var(--amber)',
