@@ -72,7 +72,9 @@ export function createLocalLoop(): LocalLoop {
       }
 
       const audioActive = hasAudioSignal(features);
-      const hvacActive = tMs - lastTempChangeMs < HVAC_OVERLAY_MS;
+      // `tMs >= lastTempChangeMs` guards against the audio clock restarting on
+      // replay (which would otherwise re-trigger the overlay with a stale edge).
+      const hvacActive = tMs >= lastTempChangeMs && tMs - lastTempChangeMs < HVAC_OVERLAY_MS;
 
       const requests: (LightingRequest | null)[] = [
         safetyRequest(state),

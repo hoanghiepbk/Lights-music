@@ -13,6 +13,10 @@ export function createFlashLimiter(maxHz: number = FLASH_MAX_HZ_PARKED): FlashLi
   return {
     allow(beat: boolean, tMs: number): boolean {
       if (!beat) return false;
+      // The audio clock (tMs) restarts at ~0 whenever a fresh source is created
+      // (e.g. Stop → Play). If it jumps backwards, treat it as a new timeline so
+      // beats aren't blocked until the stale timestamp is caught up to.
+      if (tMs < lastBeatMs) lastBeatMs = Number.NEGATIVE_INFINITY;
       if (tMs - lastBeatMs >= minIntervalMs) {
         lastBeatMs = tMs;
         return true;
