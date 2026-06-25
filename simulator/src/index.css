@@ -38,6 +38,34 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* slim, theme-matched scrollbars — replaces the chunky native one */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2b3a4d transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #2b3a4d;
+  border-radius: 9999px;
+  border: 3px solid transparent; /* padding around the thumb → slim rounded bar */
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted);
+}
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--teal);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 /* tracked instrument micro-label */
 .eyebrow {
   font-family: var(--font-mono);
@@ -182,21 +210,35 @@ input[type='range']::-moz-range-thumb {
 /* cabin beat ripple — replays on remount (keyed by pulse id) */
 @keyframes cabin-pulse {
   from {
-    opacity: 0.55;
+    opacity: 0.9;
     transform: scale(0.985);
   }
   to {
     opacity: 0;
-    transform: scale(1.03);
+    transform: scale(1.04);
   }
 }
 .cabin-pulse {
   transform-origin: center;
-  animation: cabin-pulse 380ms ease-out forwards;
+  animation: cabin-pulse 360ms ease-out forwards;
+}
+
+/* whole-cabin blink on each beat — makes the flash clearly visible */
+@keyframes cabin-flash {
+  from {
+    opacity: 0.22;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.cabin-flash {
+  animation: cabin-flash 200ms ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cabin-pulse {
+  .cabin-pulse,
+  .cabin-flash {
     animation: none;
     opacity: 0;
   }

@@ -42,6 +42,9 @@ export function CabinView({ command }: { command: LightingCommand }): React.JSX.
 
   const prevBeat = useRef(false);
   const [pulseId, setPulseId] = useState(0);
+  // Beat ring + whole-cabin flash. Toggle off to read the per-zone flashing
+  // without the outer ring/blink on top.
+  const [ringOn, setRingOn] = useState(true);
   useEffect(() => {
     if (command.beat && !prevBeat.current) setPulseId((n) => n + 1);
     prevBeat.current = command.beat;
@@ -49,9 +52,19 @@ export function CabinView({ command }: { command: LightingCommand }): React.JSX.
 
   return (
     <div className="panel relative flex h-full min-h-0 flex-col overflow-hidden">
-      <div className="flex items-baseline justify-between px-5 pt-4">
+      <div className="flex items-center justify-between px-5 pt-4">
         <span className="eyebrow">Cabin · VF8</span>
-        <span className="eyebrow">6 zones · top-down</span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setRingOn((v) => !v)}
+            title="Bật/tắt vòng + chớp cả cabin khi beat. Tắt để nhìn rõ đèn nháy từng zone bên trong."
+            className="rounded border border-[var(--line)] px-2 py-1 text-[10.5px] transition hover:border-[var(--teal)]"
+            style={{ color: ringOn ? 'var(--teal)' : 'var(--muted)' }}
+          >
+            Vòng beat: {ringOn ? 'BẬT' : 'TẮT'}
+          </button>
+          <span className="eyebrow">6 zones · top-down</span>
+        </div>
       </div>
 
       <div className="flex min-h-0 flex-1 items-center justify-center p-4">
@@ -63,10 +76,15 @@ export function CabinView({ command }: { command: LightingCommand }): React.JSX.
           {ZONE_GEO.map((g) => {
             const zc = byZone.get(g.id);
             const b = zc ? zc.brightness : 0;
+            // Display gamma: lift mid brightness so lit zones read vivid, not washed
+            // out (the level itself is unchanged — this is presentation only).
+            const vb = Math.pow(b, 0.6);
             const rgb = zc ? zc.rgb : ZERO;
             const fill = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
             const glow =
-              b > 0.03 ? `drop-shadow(0 0 ${6 + b * 20}px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${0.55 * b}))` : 'none';
+              b > 0.02
+                ? `drop-shadow(0 0 ${8 + vb * 36}px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${0.92 * vb}))`
+                : 'none';
             return (
               <rect
                 key={g.id}
@@ -77,11 +95,13 @@ export function CabinView({ command }: { command: LightingCommand }): React.JSX.
                 rx={g.rx}
                 style={{
                   fill,
-                  fillOpacity: 0.16 + b * 0.84,
+                  // low "off" floor → big contrast between dark (off) and lit, so
+                  // you can clearly tell whether a zone is on.
+                  fillOpacity: 0.05 + vb * 0.95,
                   filter: glow,
                   stroke: 'var(--line)',
                   strokeWidth: 1,
-                  transition: 'fill 120ms linear, fill-opacity 120ms linear, filter 120ms linear',
+                  transition: 'fill 90ms linear, fill-opacity 90ms linear, filter 90ms linear',
                 }}
               />
             );
@@ -119,16 +139,13 @@ export function CabinView({ command }: { command: LightingCommand }): React.JSX.
             </text>
           ))}
 
-          {/* beat ripple — keyed remount replays the animation */}
-          {pulseId > 0 && (
-            <path
-              key={pulseId}
-              className="cabin-pulse"
-              d={CAR_PATH}
-              fill="none"
-              stroke="var(--teal)"
-              strokeWidth={2}
-            />
+          {/* beat: a soft whole-cabin blink + an expanding ring — keyed remount
+              replays both animations on every beat. Hidden when the ring is off. */}
+          {ringOn && pulseId > 0 && (
+            <g key={pulseId}>
+              <path className="cabin-flash" d={CAR_PATH} fill="#eafcff" stroke="none" />
+              <path className="cabin-pulse" d={CAR_PATH} fill="none" stroke="var(--teal)" strokeWidth={3} />
+            </g>
           )}
         </svg>
       </div>

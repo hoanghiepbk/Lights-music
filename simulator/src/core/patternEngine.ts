@@ -13,12 +13,16 @@ const BAND_ORDER: readonly Band[] = ['bass', 'mid', 'high'];
 // energy-weighted BLEND of the 3 band palette colours — weighted by the live band
 // level AND the zone's spatial emphasis (ZONE_BAND_WEIGHT). So the hue shifts with
 // the spectrum (bass-heavy → warm, treble-heavy → cold) and differs across zones,
-// instead of every zone showing one static colour. Brightness = the zone's
-// weighted-average band level. Pure & deterministic — no time, no randomness.
+// instead of every zone showing one static colour. Brightness mixes the zone's
+// weighted-average level with the overall loudness, so EVERY zone stays bright
+// when the music is loud (not just the one whose home band is peaking) while the
+// colour still varies by spectrum. Pure & deterministic — no time, no randomness.
 export function musicRequest(features: AudioFeatures, presetId: number): LightingRequest {
   const preset = getPreset(presetId);
   // 0..1 perceptual band levels (D-003).
   const level = [features.bands.bass / 255, features.bands.mid / 255, features.bands.high / 255];
+  // overall loudness — lifts every zone so specialised zones don't read dim.
+  const overall = Math.max(level[0]!, level[1]!, level[2]!);
 
   const zones: ZoneColor[] = ZONES.map((zone: ZoneId): ZoneColor => {
     const w = ZONE_BAND_WEIGHT[zone];
@@ -40,7 +44,11 @@ export function musicRequest(features: AudioFeatures, presetId: number): Lightin
       energy > 0
         ? { r: Math.round(er / energy), g: Math.round(eg / energy), b: Math.round(eb / energy) }
         : { ...preset.palette.mid }; // dark zone — colour irrelevant at brightness 0
-    return { zone, rgb, brightness: clamp01(energy / wsum) };
+    // 35% zone-specific level + 65% overall loudness → the whole cabin pulses
+    // clearly with the music (colour still varies by zone via the blend above),
+    // so specialised zones never read as "is it even on?".
+    const brightness = clamp01(0.35 * (energy / wsum) + 0.65 * overall);
+    return { zone, rgb, brightness };
   });
 
   // base rate modulated by onset strength (energy proxy for tempo)
