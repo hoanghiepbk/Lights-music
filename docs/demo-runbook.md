@@ -2,6 +2,8 @@
 
 > Kịch bản quay từng bước, theo đúng thứ tự. Mỗi bước ghi: **thao tác** · **cái cần thấy trên màn** · **lời thoại 1 câu**. Bám sát tính năng đã build (scenario runner, gate-bites, Trace panel, failsafe) — không hứa cái chưa có.
 
+> **Bản deploy (production):** https://lights-music-git-main-hoanghiepbks-projects.vercel.app — tự build lại mỗi lần push lên `main`.
+
 ## Chuẩn bị trước khi bấm REC
 - `pnpm install` (1 lần) → `pnpm dev` mở sẵn `localhost:5173`.
 - Mở sẵn 2 thứ: **(a)** trình duyệt ở simulator, **(b)** terminal thứ hai cho bước 5.
