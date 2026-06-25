@@ -15,7 +15,8 @@
     "verbatimModuleSyntax": false,
     "baseUrl": ".",
     "paths": {
-      "@nhipsang/schema": ["./schema/src/index.ts"]
+      "@nhipsang/schema": ["./schema/src/index.ts"],
+      "@sim/*": ["./simulator/src/*"]
     }
   }
 }

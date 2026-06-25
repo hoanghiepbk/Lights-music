@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import type { AudioFeatures, AudioSource } from '@nhipsang/schema';
-import { createFeatureExtractor } from '../../simulator/src/audio/featureExtractor';
-import { createAudioEngine } from '../../simulator/src/audio';
-import { createWebAudioSource } from '../../simulator/src/audio/webAudioSource';
+import { createFeatureExtractor } from '@sim/audio/featureExtractor';
+import { createAudioEngine } from '@sim/audio';
+import { createWebAudioSource } from '@sim/audio/webAudioSource';
 
 const SR = 44100;
 const N = 1024;
