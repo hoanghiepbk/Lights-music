@@ -1,11 +1,7 @@
-[![CI](https://github.com/hoanghiepbk/Lights-music/actions/workflows/ci.yml/badge.svg)](https://github.com/hoanghiepbk/Lights-music/actions/workflows/ci.yml)
-<!-- Badge path = hoanghiepbk/Lights-music (repo root sau re-root D-009). -->
 
 # NhipSang
 
 **Music-reactive ambient lighting, tích hợp native trên MHU — an toàn theo chuẩn ô tô.**
-
-> 🔗 Live demo: _<Vercel link — Thợ điền>_ · 🎬 Video: _<link — Hiệp điền>_
 
 ---
 
