@@ -1,5 +1,5 @@
-[![CI](https://github.com/hoanghiepbk/nhipsang/actions/workflows/ci.yml/badge.svg)](https://github.com/hoanghiepbk/nhipsang/actions/workflows/ci.yml)
-<!-- Badge path = hoanghiepbk/nhipsang. Chỉnh <user>/<repo> nếu GitHub repo tên khác (vd hoanghiepbk/Lights-music). -->
+[![CI](https://github.com/hoanghiepbk/Lights-music/actions/workflows/ci.yml/badge.svg)](https://github.com/hoanghiepbk/Lights-music/actions/workflows/ci.yml)
+<!-- Badge path = hoanghiepbk/Lights-music (repo root sau re-root D-009). -->
 
 # NhipSang
 
