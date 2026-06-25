@@ -18,6 +18,7 @@ const vehicle: VehicleState = {
 
 const command: LightingCommand = {
   presetId: 1,
+  zones: [],
   bandLevels: [120, 80, 40],
   beat: true,
   zoneMask: 0b000001,
