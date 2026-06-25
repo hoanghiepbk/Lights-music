@@ -6,9 +6,10 @@ import type { StepResult, WinnerSource } from '../engine/localLoop';
 import type { TransportStatus } from '../transport/supabaseTransport';
 import { THROTTLE_HZ } from '../transport/supabaseTransport';
 
-// Frame budget for the high-level wire (20 Hz CAN-FD, Blueprint §7). The
-// pipeline compute below is MEASURED; transport publishes throttled high-level
-// params (≤25 Hz) but ECU render stays a simulated target — no end-to-end claim.
+// Frame budget for the high-level wire (20 Hz CAN-FD, Blueprint §7). The pipeline
+// compute below is MEASURED end-of-extraction → command (FFT/onset/AGC + pattern +
+// arbiter + policy); transport publishes throttled high-level params (≤25 Hz) but
+// ECU render stays a simulated target — no end-to-end claim.
 const FRAME_BUDGET_MS = 50;
 
 const SOURCE_COLOR: Record<WinnerSource, string> = {
@@ -61,6 +62,7 @@ export function TracePanel({
     : [];
 
   const computeMs = trace?.computeMs ?? 0;
+  const resolveMs = trace?.resolveMs ?? 0;
   const pct = Math.min(100, (computeMs / FRAME_BUDGET_MS) * 100);
 
   return (
@@ -76,8 +78,12 @@ export function TracePanel({
         <div className="h-1 w-full overflow-hidden rounded-full bg-[var(--line)]">
           <div className="h-full rounded-full bg-[var(--teal)]" style={{ width: `${pct}%` }} />
         </div>
+        <div className="flex items-center justify-between">
+          <span className="telemetry text-[10.5px] text-[var(--muted)]">resolve (safety core)</span>
+          <span className="telemetry text-[10.5px] text-[var(--muted)]">{resolveMs.toFixed(3)} ms</span>
+        </div>
         <p className="telemetry text-[10.5px] leading-relaxed text-[var(--muted)]">
-          measured: arbiter + policy + resolve · budget {FRAME_BUDGET_MS} ms (20 Hz wire). transport publishes ≤
+          measured: FFT/onset/AGC + pattern + arbiter + policy. budget: FFT/onset ≤15 ms (§3.3); transport ≤
           {THROTTLE_HZ} Hz; ECU render = target (sim) — not an end-to-end number.
         </p>
       </div>

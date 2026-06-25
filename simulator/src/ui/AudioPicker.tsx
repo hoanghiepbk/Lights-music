@@ -12,7 +12,7 @@ export function AudioPicker({
   onPlayingChange,
   onAudioError,
 }: {
-  onFeatures: (f: AudioFeatures) => void;
+  onFeatures: (f: AudioFeatures, featureMs: number) => void;
   onPlayingChange: (playing: boolean) => void;
   onAudioError: (faulted: boolean) => void;
 }): React.JSX.Element {

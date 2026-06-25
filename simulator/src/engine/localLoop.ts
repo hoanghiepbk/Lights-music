@@ -23,11 +23,22 @@ export type WinnerSource = LightingSource | 'failsafe';
 export interface StepResult {
   command: LightingCommand;
   winnerSource: WinnerSource;
-  computeMs: number; // wall time around resolve() — "pipeline compute" (measured)
+  // Pipeline compute (measured) = feature extraction + resolve. featureMs is the
+  // FFT/onset/AGC cost of the latest audio frame (passed in by the caller, 0 when
+  // idle); resolveMs is arbiter+policy+resolve (the safety core — typically tiny).
+  computeMs: number;
+  featureMs: number;
+  resolveMs: number;
 }
 
 export interface LocalLoop {
-  step(features: AudioFeatures, state: VehicleState, presetId: number, fault?: boolean): StepResult;
+  step(
+    features: AudioFeatures,
+    state: VehicleState,
+    presetId: number,
+    fault?: boolean,
+    featureMs?: number,
+  ): StepResult;
 }
 
 // HVAC is a transient climate overlay: PRIORITY_ORDER ranks hvac ABOVE music,
@@ -49,7 +60,7 @@ export function createLocalLoop(): LocalLoop {
   let lastTempChangeMs = Number.NEGATIVE_INFINITY;
 
   return {
-    step(features, state, presetId, fault = false): StepResult {
+    step(features, state, presetId, fault = false, featureMs = 0): StepResult {
       const tMs = features.beat.tMs;
 
       // Track temperature edges to drive the transient HVAC overlay.
@@ -75,13 +86,15 @@ export function createLocalLoop(): LocalLoop {
 
       const start = performance.now();
       const command = resolver.resolve({ requests, state, features, fault });
-      const computeMs = performance.now() - start;
+      const resolveMs = performance.now() - start;
 
       return {
         command,
         // D-007: a fault overrides everything → failsafe.
         winnerSource: fault ? 'failsafe' : winner ? winner.source : 'failsafe',
-        computeMs,
+        computeMs: featureMs + resolveMs,
+        featureMs,
+        resolveMs,
       };
     },
   };

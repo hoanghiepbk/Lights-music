@@ -8,17 +8,21 @@ export { magnitudeSpectrum } from './fft';
 // './webAudioSource' where needed to keep this entry node-safe.
 
 export interface AudioEngine {
-  onFeatures(cb: (features: AudioFeatures) => void): void;
+  // featureMs = wall time of the FFT/onset/AGC extraction for this frame, so the
+  // app can fold it into the pipeline-compute readout (TIP-011).
+  onFeatures(cb: (features: AudioFeatures, featureMs: number) => void): void;
   stop(): void;
 }
 
 export function createAudioEngine(source: AudioSource): AudioEngine {
   const extractor = createFeatureExtractor();
-  let featuresCb: ((features: AudioFeatures) => void) | null = null;
+  let featuresCb: ((features: AudioFeatures, featureMs: number) => void) | null = null;
 
   source.onFrame((pcm, sampleRate) => {
+    const t0 = performance.now();
     const features = extractor.process(pcm, sampleRate);
-    if (featuresCb) featuresCb(features);
+    const featureMs = performance.now() - t0;
+    if (featuresCb) featuresCb(features, featureMs);
   });
 
   return {

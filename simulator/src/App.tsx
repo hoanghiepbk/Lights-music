@@ -35,6 +35,7 @@ export default function App() {
   const playingRef = useRef(false);
   const audioErrorRef = useRef(false);
   const latestFeaturesRef = useRef<AudioFeatures | null>(null);
+  const latestFeatureMsRef = useRef(0);
   const pendingOnsetRef = useRef(false);
   const idleClockRef = useRef(0);
   const statusRef = useRef<TransportStatus>(transportStatus);
@@ -50,16 +51,19 @@ export default function App() {
     let raf = 0;
     const frame = (): void => {
       let feats: AudioFeatures;
+      let featureMs: number;
       const latest = latestFeaturesRef.current;
       if (playingRef.current && latest) {
         feats = pendingOnsetRef.current ? { ...latest, beat: { ...latest.beat, onset: true } } : latest;
         pendingOnsetRef.current = false;
+        featureMs = latestFeatureMsRef.current; // fold FFT/onset/AGC cost into computeMs
       } else {
         idleClockRef.current += 16;
         feats = {
           bands: { bass: 0, mid: 0, high: 0 },
           beat: { onset: false, strength: 0, tMs: idleClockRef.current },
         };
+        featureMs = 0; // idle: no audio frame extracted this tick
       }
 
       const transport = transportRef.current!;
@@ -70,7 +74,7 @@ export default function App() {
       }
       const fault = audioErrorRef.current || st === 'error';
 
-      const r = loopRef.current.step(feats, vehicleStore.get(), presetRef.current, fault);
+      const r = loopRef.current.step(feats, vehicleStore.get(), presetRef.current, fault, featureMs);
       setCommand(r.command);
       setTrace(r);
 
@@ -95,8 +99,9 @@ export default function App() {
     return () => clearInterval(id);
   }, [scenarioRunning]);
 
-  const onFeatures = useCallback((f: AudioFeatures) => {
+  const onFeatures = useCallback((f: AudioFeatures, featureMs: number) => {
     latestFeaturesRef.current = f;
+    latestFeatureMsRef.current = featureMs;
     if (f.beat.onset) pendingOnsetRef.current = true;
   }, []);
 
