@@ -6,6 +6,9 @@
   "description": "NhipSang eval-as-code — Vitest invariant suite (INV-1..6) + smoke",
   "scripts": {
     "test": "vitest run",
+    "test:critical": "vitest run critical",
+    "test:quality": "vitest run quality",
+    "test:demo:violation": "vitest run --config vitest.demo.config.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },

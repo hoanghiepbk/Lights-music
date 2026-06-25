@@ -1,9 +1,9 @@
 import { defineConfig } from 'vitest/config';
 import { fileURLToPath } from 'node:url';
 
-// Invariant suite (INV-1..6) + fault injection land in TIP-007.
-// `@sim/*` resolves to simulator/src/* so eval imports core/audio without
-// brittle relative paths (mirrors tsconfig.base paths for typecheck).
+// Default suite = Critical (safety gate) + Quality (informational). The
+// gate-bites demo lives in eval/demo and is intentionally EXCLUDED here — run it
+// via `pnpm test:demo:violation` (vitest.demo.config.ts). `@sim/*` → simulator/src.
 export default defineConfig({
   resolve: {
     alias: {
@@ -12,6 +12,6 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['tests/**/*.test.ts'],
+    include: ['critical/**/*.test.ts', 'quality/**/*.test.ts'],
   },
 });

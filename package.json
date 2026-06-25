@@ -10,6 +10,9 @@
     "build": "pnpm --filter simulator build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm --filter eval test",
+    "test:critical": "pnpm --filter eval test:critical",
+    "test:quality": "pnpm --filter eval test:quality",
+    "test:demo:violation": "pnpm --filter eval test:demo:violation",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
